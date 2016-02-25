@@ -149,6 +149,7 @@ public class ChatServer {
                 accounts.remove(msgs[1]);
                 accountStatus.remove(msgs[1]);
                 undeliveredMessages.remove(msgs[1]);
+                output = "Account Deleted.";
                 
             //return a list of the accounts on the server
             } else if (LISTACCOUNT.equals(msgs[0])){
@@ -231,6 +232,7 @@ public class ChatServer {
 
             	}
         	   groups.put(msgs[1], groupMembers);
+        	   output = "Group Created";
 
             }else if (HELP.equals(msgs[0])){
             	SendOverNetwork(out, "Commands Available:");
