@@ -31,10 +31,17 @@ public class ChatClient {
      */
     public void connectToServer() throws IOException {
         // set as local address for now
-        String serverAddress = "127.0.0.1";
+
+    	System.out.print("Please key in the IP of the chat server:\n");
+    	Scanner scanner = new Scanner(System.in);
+		//This will pause to get client input
+    	
+		//String command = scanner.nextLine();
+    	
+    	String serverAddress = scanner.nextLine();
 
         // Make connection and initialize streams
-        Socket socket = new Socket(serverAddress, 9898);
+        Socket socket = new Socket(serverAddress, 2001);
     	
     	try{
             

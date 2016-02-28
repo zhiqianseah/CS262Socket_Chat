@@ -52,7 +52,7 @@ public class ChatServer {
         
         System.out.println("The chat server is running.");
         int clientNumber = 0;
-        ServerSocket listener = new ServerSocket(9898);
+        ServerSocket listener = new ServerSocket(2001);
         try {
             while (true) {
                 new Chat(listener.accept(), clientNumber++).start();
