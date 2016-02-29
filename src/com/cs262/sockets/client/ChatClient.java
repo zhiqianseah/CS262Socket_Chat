@@ -90,7 +90,7 @@ public class ChatClient {
     }
     
     private String checkHeaders(String msg){
-		System.out.print(msg +"\n");
+		//System.out.print(msg +"\n");
     	//Check that version number is correct
     	if (msg.startsWith(APPVERSION)){
         	String stripped = msg.substring(APPVERSION.length()+1);  
