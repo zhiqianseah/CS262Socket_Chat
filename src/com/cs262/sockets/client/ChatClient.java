@@ -1,5 +1,5 @@
 //Adapted from http://cs.lmu.edu/~ray/notes/javanetexamples/
-
+package com.cs262.sockets.client;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -21,14 +21,10 @@ public class ChatClient {
     //This is essentially a cookie to maintain login status
     private static String cookie = null;
     private static final String APPVERSION = "ChatApp_v0.1";
-    
-    /**
-     * Implements the connection logic by prompting the end user for
-     * the server's IP address, connecting, setting up streams, and
-     * consuming the welcome messages from the server.  The Capitalizer
-     * protocol says that the server sends three lines of text to the
-     * client immediately after establishing a connection.
-     */
+	private static final String CREATE = ":create"; 
+	private static final String LOGIN = ":login";
+
+	
     public void connectToServer() throws IOException {
         // set as local address for now
 
@@ -67,17 +63,18 @@ public class ChatClient {
 	                return;
 	            }
         		System.out.print(response + "\n");
-        		
+        		/*
 	        	if (response.contains("Logged in as:")) {
 	            	
 	            	//Save the logged in info as the cookie
 	            	cookie = response.substring(response.indexOf("Logged in as:")+13);
 	            	//System.out.print("cookie is:"+cookie +"\n");
 	            }
-	        	else if (response.contains("Logged off as:")) {
+	        	else if (response.contains("Logged off as:") || response.contains("Account Deleted:")) {
 	        		cookie = null;
 	            	//System.out.print("cookie is cleared.\n");
 	        	}
+	        	*/
 	        }
     	}catch(SocketException e){
     		System.out.print("Error: " + e.getMessage() + "\n");    
@@ -93,15 +90,32 @@ public class ChatClient {
     }
     
     private String checkHeaders(String msg){
-    	
+		System.out.print(msg +"\n");
     	//Check that version number is correct
     	if (msg.startsWith(APPVERSION)){
         	String stripped = msg.substring(APPVERSION.length()+1);  
         	
-        	//check that message length is correct
+
+        	
+        	
+        	
+
         	String[] splitted = stripped.trim().split(" ");
-        	int length = Integer.parseInt(splitted[0]);
-        	stripped = stripped.substring(splitted[0].length()+1);
+        	
+        	//check if the message is fixing any cookies
+        	if (splitted[0].startsWith("cookie:")) {
+        		cookie = splitted[0].substring(7);
+
+        		
+        	}
+        	else if (splitted[0].startsWith("clear_cookie")){
+        		cookie = null;
+        	}
+        		
+        			
+            //check that message length is correct        			
+        	int length = Integer.parseInt(splitted[1]);
+        	stripped = stripped.substring(splitted[0].length() + 1 + splitted[1].length()+1);
         	if (stripped.length() == length){
         		return stripped;
         	}
@@ -116,7 +130,8 @@ public class ChatClient {
 
     }
     
-
+    
+    
     private static class MessageSender implements Runnable {
         public MessageSender() {
             (new Thread(this)).start();
@@ -137,11 +152,19 @@ public class ChatClient {
 	    		} 
 	    		
 	    		//ensure that for operations that requires login, the user IS logged in
-	    		while((command.startsWith(TOACCOUNT) || command.startsWith(TOGROUP)
+	    		//ensure that for operations that requires logout, the user IS logged out
+	    		while(((command.startsWith(TOACCOUNT) || command.startsWith(TOGROUP)
 	    				|| command.startsWith(GROUP) || command.startsWith(SIGNOUT)
 	    				|| command.startsWith(DELETE))
-	    				&& (cookie== null)){
-	        		System.out.print("Error: Not Logged in.\n");	 
+	    				&& (cookie== null)  )
+	    				|| ((command.startsWith(CREATE) || (command.startsWith(LOGIN)))
+	    				&& (cookie != null))){
+	    			
+	    			if (cookie == null){
+	    				System.out.print("Error: Not Logged in.\n");	
+	    			} else {
+	    				System.out.print("Error: Please Log out first!\n");	    				
+	    			}
 	        		command = scanner.nextLine();
 	    		}
 	    		

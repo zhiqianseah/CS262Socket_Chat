@@ -1,14 +1,12 @@
 //Adapted from http://cs.lmu.edu/~ray/notes/javanetexamples/
-
+package com.cs262.sockets.server;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.rmi.RemoteException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -149,11 +147,13 @@ public class ChatServer {
                 accounts.remove(msgs[1]);
                 accountStatus.remove(msgs[1]);
                 undeliveredMessages.remove(msgs[1]);
-                output = "Account Deleted.";
+                output = "Account Deleted:"+msgs[1];
+                SendOverNetworkClearCookie(out, output);
                 
             //return a list of the accounts on the server
             } else if (LISTACCOUNT.equals(msgs[0])){
             	output = accounts.keySet().toString();
+                SendOverNetwork(out, output);
             	
             //create a user account with <username> <password>
             }else if (CREATE.equals(msgs[0]) && msgs.length == 3){            	
@@ -165,9 +165,10 @@ public class ChatServer {
 					
 
 					acc_sockets.put(msgs[1], out);
-					
+	                SendOverNetworkCookie(out, output, msgs[1]);
                 } else {
                 	output = "Username has been taken";
+                    SendOverNetwork(out, output);
                 }
           
             //login to an existing account with <username> <password>
@@ -182,15 +183,17 @@ public class ChatServer {
                 } else {
                 	output = "Login Failed";
                 }
-          
+                SendOverNetworkCookie(out, output, msgs[1]);
             //sign out of an account
             } else if (SIGNOUT.equals(msgs[0]) && msgs.length == 2) {
             	output = "Logged off as: "+msgs[1];
             	signout(msgs[1]);
+            	SendOverNetworkClearCookie(out, output);
             	
             //list the groups that are present on the server
             } else if (LISTGROUP.equals(msgs[0])){
             	output = groups.keySet().toString();
+                SendOverNetwork(out, output);
             	
             //send a message to a recipient account
             } else if (TOACCOUNT.equals(msgs[0])&& msgs.length >= 4){
@@ -201,6 +204,7 @@ public class ChatServer {
             		message = message+" "+msgs[x];
             	}
             	output = sendChatMessage(receiver, message);
+                SendOverNetwork(out, output);
 
             } else if (TOGROUP.equals(msgs[0]) && msgs.length >= 4){
             	String sender = msgs[msgs.length-1];
@@ -224,6 +228,7 @@ public class ChatServer {
         		   output = "";
         	   }else {
         		   output = "Group doesn't exist "+msgs[1];
+                   SendOverNetwork(out, output);
         	   }
             } else if (GROUP.equals(msgs[0]) && msgs.length >= 3){
           	   	List<String> groupMembers = new ArrayList<String>();
@@ -233,6 +238,7 @@ public class ChatServer {
             	}
         	   groups.put(msgs[1], groupMembers);
         	   output = "Group Created";
+               SendOverNetwork(out, output);
 
             }else if (HELP.equals(msgs[0])){
             	SendOverNetwork(out, "Commands Available:");
@@ -252,9 +258,10 @@ public class ChatServer {
             	output = "";
             } else {
             	output = "Command not found / Length of input is incorrect";
+                SendOverNetwork(out, output);
             } 
             //log("Returning output: "+ output +"\n");  
-            SendOverNetwork(out, output);
+
             //out.println("Enter command: ");
             
             
@@ -302,9 +309,20 @@ public class ChatServer {
         //Add header information, such as version number and length of message
         //Send message to server
         private void SendOverNetwork(PrintWriter out, String message) {
-    		out.println(APPVERSION + " " + message.length()+ " " + message);
+    		out.println(APPVERSION + " no_cookie " + message.length()+ " " + message);
         }
-        
+ 
+        //Add header information, such as version number and length of message
+        //Send message to server
+        private void SendOverNetworkCookie(PrintWriter out, String message, String cookie) {
+    		out.println(APPVERSION + " cookie:" + cookie + " " + message.length()+ " " + message);
+        }  
+     
+        //Add header information, such as version number and length of message
+        //Send message to server
+        private void SendOverNetworkClearCookie(PrintWriter out, String message) {
+    		out.println(APPVERSION + " clear_cookie " + message.length()+ " " + message);
+        }     
         
         //create an account with username and password
         //return false if the account has been taken
