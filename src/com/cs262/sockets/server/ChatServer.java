@@ -9,6 +9,9 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Scanner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class ChatServer {
 
@@ -47,10 +50,16 @@ public class ChatServer {
         groups = new HashMap<String, List<String>>();
         undeliveredMessages = new HashMap<String, List<String>>();
         accountStatus = new HashMap<String, String>();
+ 
         
-        System.out.println("The chat server is running.");
+    	System.out.print("Please key in the port number:\n");
+    	Scanner scanner = new Scanner(System.in);
+    	String portnumber = scanner.nextLine();
+    	
+        
         int clientNumber = 0;
-        ServerSocket listener = new ServerSocket(2001);
+        ServerSocket listener = new ServerSocket(Integer.parseInt(portnumber));
+        System.out.println("The chat server is running.");
         try {
             while (true) {
                 new Chat(listener.accept(), clientNumber++).start();
@@ -151,8 +160,22 @@ public class ChatServer {
                 SendOverNetworkClearCookie(out, output);
                 
             //return a list of the accounts on the server
-            } else if (LISTACCOUNT.equals(msgs[0])){
-            	output = accounts.keySet().toString();
+            } else if (LISTACCOUNT.equals(msgs[0]) && msgs.length <= 2){
+            	
+            	if (msgs.length == 1) {
+            		output = accounts.keySet().toString();
+            	}
+            	//wildcard search. eg return "[user1, user2]" for ":listaccount us*"
+            	else {
+            		List<String> searchResult = new ArrayList<String>();
+            		for (String accountName : accounts.keySet()){
+            			if (accountName.matches(msgs[1].replace("*", ".*?"))){
+            				searchResult.add(accountName);
+            			}
+            		}
+            		
+            		output = searchResult.toString();
+            	}
                 SendOverNetwork(out, output);
             	
             //create a user account with <username> <password>
@@ -191,8 +214,23 @@ public class ChatServer {
             	SendOverNetworkClearCookie(out, output);
             	
             //list the groups that are present on the server
-            } else if (LISTGROUP.equals(msgs[0])){
-            	output = groups.keySet().toString();
+            } else if (LISTGROUP.equals(msgs[0])&& msgs.length <= 2){
+            	
+            	if (msgs.length == 1) {
+            		output = groups.keySet().toString();
+            	}
+            	
+            	//wildcard search. eg return "[user1, user2]" for ":listgroup us*"
+            	else {
+            		List<String> searchResult = new ArrayList<String>();
+            		for (String accountName : groups.keySet()){
+            			if (accountName.matches(msgs[1].replace("*", ".*?"))){
+            				searchResult.add(accountName);
+            			}
+            		}
+            		output = searchResult.toString();
+            		
+            	}
                 SendOverNetwork(out, output);
             	
             //send a message to a recipient account

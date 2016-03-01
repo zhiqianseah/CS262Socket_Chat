@@ -26,19 +26,30 @@ public class ChatClient {
 
 	
     public void connectToServer() throws IOException {
-        // set as local address for now
 
-    	System.out.print("Please key in the IP of the chat server:\n");
-    	Scanner scanner = new Scanner(System.in);
-		//This will pause to get client input
+    	Socket socket = null;
     	
-		//String command = scanner.nextLine();
-    	
-    	String serverAddress = scanner.nextLine();
+    	//repeat till user gives a valid IP and port number
+    	while(socket == null){
+	    	try {
+	    		// Make connection and initialize streams
+	        	System.out.print("Please key in the IP of the chat server:\n");
+	        	Scanner scanner = new Scanner(System.in);	
+	        	String serverAddress = scanner.nextLine();
 
-        // Make connection and initialize streams
-        Socket socket = new Socket(serverAddress, 2001);
+	        	System.out.print("Please key in the port number:\n");
+	        	String portnumber = scanner.nextLine();
+	    		socket = new Socket(serverAddress, Integer.parseInt(portnumber));
+	    	}
+	    	catch(Exception e) {
+	    		System.out.print("Error: " + e.getMessage() + "\n");    
+	    		System.out.print("Please Try Again.\n");   
+	    		
+	    	}
+    	}
     	
+    	
+    	//read the inputs from the socket
     	try{
             
 	        in = new BufferedReader(
