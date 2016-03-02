@@ -6,11 +6,13 @@ Check out the source code and build the project, then follow the steps below to 
 Open a new command window 
 -cd to ~workspace/bin
 -java com.cs262.sockets.server.ChatServer
+-input the port number as user-input
 
 3. Start Client
 Open a new command window
 -cd to ~workspace/bin
 -java com.cs262.sockets.client.ChatClient
+-input the server IP address and port number as user-input
 
 4. Follow step 3 to start more clients
 
