@@ -1,4 +1,4 @@
-//Adapted from http://cs.lmu.edu/~ray/notes/javanetexamples/
+//Help taken from http://cs.lmu.edu/~ray/notes/javanetexamples/
 package com.cs262.sockets.client;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -18,7 +18,7 @@ public class ChatClient {
     private static final String GROUP = ":group";    
 	private static final String SIGNOUT = ":signout";    
 	private static final String DELETE = ":delete";        
-    //This is essentially a cookie to maintain login status
+    //The cookie is used to maintain login status
     private static String cookie = null;
     private static final String APPVERSION = "ChatApp_v0.1";
 	private static final String CREATE = ":create"; 
@@ -74,18 +74,7 @@ public class ChatClient {
 	                return;
 	            }
         		System.out.print(response + "\n");
-        		/*
-	        	if (response.contains("Logged in as:")) {
-	            	
-	            	//Save the logged in info as the cookie
-	            	cookie = response.substring(response.indexOf("Logged in as:")+13);
-	            	//System.out.print("cookie is:"+cookie +"\n");
-	            }
-	        	else if (response.contains("Logged off as:") || response.contains("Account Deleted:")) {
-	        		cookie = null;
-	            	//System.out.print("cookie is cleared.\n");
-	        	}
-	        	*/
+
 	        }
     	}catch(SocketException e){
     		System.out.print("Error: " + e.getMessage() + "\n");    
@@ -102,15 +91,11 @@ public class ChatClient {
     
     private String checkHeaders(String msg){
 		//System.out.print(msg +"\n");
+    	
     	//Check that version number is correct
     	if (msg.startsWith(APPVERSION)){
         	String stripped = msg.substring(APPVERSION.length()+1);  
         	
-
-        	
-        	
-        	
-
         	String[] splitted = stripped.trim().split(" ");
         	
         	//check if the message is fixing any cookies

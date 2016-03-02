@@ -1,4 +1,4 @@
-//Adapted from http://cs.lmu.edu/~ray/notes/javanetexamples/
+//Help taken from http://cs.lmu.edu/~ray/notes/javanetexamples/
 package com.cs262.sockets.server;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -22,7 +22,6 @@ public class ChatServer {
 	private static HashMap<String, List<String>> undeliveredMessages;
 	private static HashMap<String, String> accountStatus;
 
-	// TODO: List of command, create enum for these
 	private static final String CREATE = ":create"; 
 	private static final String LISTACCOUNT = ":listaccount";
 	private static final String LOGIN = ":login";
@@ -35,14 +34,7 @@ public class ChatServer {
 	private static final String HELP = ":help"; 	   
 	
     private static final String APPVERSION = "ChatApp_v0.1";
-    /**
-     * Application method to run the server runs in an infinite loop
-     * listening on port 9898.  When a connection is requested, it
-     * spawns a new thread to do the servicing and immediately returns
-     * to listening.  The server keeps a unique client number for each
-     * client that connects just to show interesting logging
-     * messages.  It is certainly not necessary to do this.
-     */
+
     public static void main(String[] args) throws Exception {
     	
         accounts = new HashMap<String, String>();
@@ -52,12 +44,15 @@ public class ChatServer {
         accountStatus = new HashMap<String, String>();
  
         
+        //Get a user-input port number for the chat server
     	System.out.print("Please key in the port number:\n");
     	Scanner scanner = new Scanner(System.in);
     	String portnumber = scanner.nextLine();
     	
         
         int clientNumber = 0;
+        
+        //create the server socket using the port number
         ServerSocket listener = new ServerSocket(Integer.parseInt(portnumber));
         System.out.println("The chat server is running.");
         try {
@@ -70,11 +65,6 @@ public class ChatServer {
     }
    
 
-    /**
-     * A private thread to handle capitalization requests on a particular
-     * socket.  The client terminates the dialogue by sending a single line
-     * containing only a period.
-     */
     private static class Chat extends Thread {
         private Socket socket;
         private int clientNumber;
@@ -85,11 +75,7 @@ public class ChatServer {
             log("New connection with client# " + clientNumber + " at " + socket);
         }
 
-        /**
-         * Services this thread's client by first sending the
-         * client a welcome message then repeatedly reading strings
-         * and sending back the capitalized version of the string.
-         */
+
         public void run() {
             try {
 
@@ -101,7 +87,7 @@ public class ChatServer {
                 PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
 
                 // Send a welcome message to the client.
-            	SendOverNetwork(out, "Hello, you are client #" + clientNumber + ".");
+            	SendOverNetwork(out, "Welcome to the Chat App");
             	SendOverNetwork(out, "Please log in with \":login <username> <password>\" or create an account via "
                 		+ "\":create <username> <password>");
             	SendOverNetwork(out, "Enter :help to get the list of commands");
@@ -446,11 +432,8 @@ public class ChatServer {
         	
         }      
             
-        
-        /**
-         * Logs a simple message.  In this case we just write the
-         * message to the server applications standard output.
-         */       
+
+        //output logging to screen
         private void log(String message) {
             System.out.println(message);
         }
