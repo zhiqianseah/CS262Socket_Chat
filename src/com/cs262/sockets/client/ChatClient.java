@@ -8,11 +8,20 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.util.Scanner;
 
+/**
+ * Client side of the Chat Application. Each user starts a chat client and connect to the chat server
+ * via a command-line input of (IP_address, Port Number). 
+ * If connection fails, prompt the user for another (IP_address, Port number) until the connection succeeds.
+ * Once connected, the chat client will read the user inputs, sends it to the chat server, and prints
+ * the replies from the chat server.
+ */
+
 public class ChatClient {
 
     private static BufferedReader in;
     private static PrintWriter out;
     
+    //List of accepted opcodes
     private static final String TOACCOUNT = ":send";
     private static final String TOGROUP = ":togroup";
     private static final String GROUP = ":group";    
@@ -25,7 +34,12 @@ public class ChatClient {
 	private static final String LOGIN = ":login";
 
 	
-    public void connectToServer() throws IOException {
+    /** Connect the chat client to the server via command-line inputs. It then create a separate thread to handle
+     * the sending of messages (MessageSender class). This thread will continue to listen to messages from the server and 
+     * print it to the screen. 
+     * @throws IOException from sockets
+     */
+    private void connectToServer() throws IOException {
 
     	Socket socket = null;
     	
@@ -89,6 +103,12 @@ public class ChatClient {
     	
     }
     
+    /** Check that the message received from the server has valid headers. The message should have the correct
+     * app number. If there is an op_code for setting or deleting the cookie, execute it accordingly on the client side.
+     * Lastly, check that the message length is correct. Return the main content of the message
+     * @param msg message received from the server
+     * @return main content of the message (without the headers)
+     */
     private String checkHeaders(String msg){
 		//System.out.print(msg +"\n");
     	
@@ -128,12 +148,26 @@ public class ChatClient {
     
     
     
+    /** Separate thread to handle the sending of messages. This is necessary because a message may arrive while 
+     * the current thread is waiting for a user-input. Runs in a infinite while loop until the user chooses to quit
+     * the chat app. 
+     *
+     */
     private static class MessageSender implements Runnable {
+        /**Creates a new thread and run it
+         */
         public MessageSender() {
             (new Thread(this)).start();
         }
 
     	
+        /** Run the message sender thread by listening to user command line inputs, sending it to the chat server. 
+         * In an infinite while loop, listen to user input commands. check that the command correspond with the login status.
+         * For example, sending a message requires the user to be logged in, while creating a new account requires the user to
+         * be logged out. For commands that require logged in privileges, append the current cookie to the end of the message
+         * Finally, send the message to the chat server.
+         * Quit the chat client app if the command ":quit" is keyed. 
+         */
         public void run() {
 
         	Scanner scanner = new Scanner(System.in);
@@ -177,13 +211,21 @@ public class ChatClient {
     		}
         }
         
-        //Add header information, such as version number and length of message
-        //Send message to server
+
+        /** Add header information, such as version number and length of message and 
+         * send it to the server
+         * @param message message to be sent over to the server
+         */
         private void SendOverNetwork(String message) {
     		out.println(APPVERSION + " " +message.length()+ " " + message);
         }
     }
     
+
+    /** main function to start a chat client. 
+     * Create a new ChatClient instance, and connect to the server.
+     * @throws Exception throws the exception from connectToServer
+     */
     public static void main(String[] args) throws Exception {
     	ChatClient client = new ChatClient();
         client.connectToServer();
