@@ -51,4 +51,4 @@ Open a new command window
 		:quit
 
     5.11 Print the available commands
-	:help
+		:help
