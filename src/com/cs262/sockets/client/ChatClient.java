@@ -22,19 +22,52 @@ public class ChatClient {
     private static PrintWriter out;
     
     //List of accepted opcodes
+    /**
+	 * Command that sends a single message to an account.
+	 * If the recipient is logged in, deliver immediately; 
+	 * otherwise queue the message and deliver on demand
+	 */
     private static final String TOACCOUNT = ":send";
+    /**
+	 * Command that sends a single message to all members of the group.
+	 * If the recipient is logged in, deliver immediately; 
+	 * otherwise queue the message and deliver on demand
+	 */
     private static final String TOGROUP = ":togroup";
-    private static final String GROUP = ":group";    
-	private static final String SIGNOUT = ":signout";    
+    /**
+	 * Command that creates a group
+	 */
+    private static final String GROUP = ":group";   
+    /**
+	 * Command to log out from the chat room
+	 */
+	private static final String SIGNOUT = ":signout";
+	/**
+	 * Command to delete an account
+	 */
 	private static final String DELETE = ":delete";        
-    //The cookie is used to maintain login status
+    /**
+     * The cookie that is used to maintain login status
+     */
     private static String cookie = null;
+    /**
+	 * String constant for the current application version
+	 */
     private static final String APPVERSION = "ChatApp_v0.1";
+    /**
+	 * Command to create an account for the chat room
+	 * using a user name and password as arguments.
+	 */
 	private static final String CREATE = ":create"; 
+	/**
+	 * Command that allows a user to login to the chat room
+	 * using a user name and password as arguments.
+	 */
 	private static final String LOGIN = ":login";
 
 	
-    /** Connect the chat client to the server via command-line inputs. It then create a separate thread to handle
+    /**
+     * Connect the chat client to the server via command-line inputs. It then create a separate thread to handle
      * the sending of messages (MessageSender class). This thread will continue to listen to messages from the server and 
      * print it to the screen. 
      * @throws IOException from sockets
@@ -103,7 +136,8 @@ public class ChatClient {
     	
     }
     
-    /** Check that the message received from the server has valid headers. The message should have the correct
+    /**
+     * Check that the message received from the server has valid headers. The message should have the correct
      * app number. If there is an op_code for setting or deleting the cookie, execute it accordingly on the client side.
      * Lastly, check that the message length is correct. Return the main content of the message
      * @param msg message received from the server
@@ -148,20 +182,22 @@ public class ChatClient {
     
     
     
-    /** Separate thread to handle the sending of messages. This is necessary because a message may arrive while 
+    /**
+     * Separate thread to handle the sending of messages. This is necessary because a message may arrive while 
      * the current thread is waiting for a user-input. Runs in a infinite while loop until the user chooses to quit
-     * the chat app. 
-     *
+     * the chat app.
      */
     private static class MessageSender implements Runnable {
-        /**Creates a new thread and run it
+        /**
+         * Creates a new thread and run it
          */
         public MessageSender() {
             (new Thread(this)).start();
         }
 
     	
-        /** Run the message sender thread by listening to user command line inputs, sending it to the chat server. 
+        /**
+         * Run the message sender thread by listening to user command line inputs, sending it to the chat server. 
          * In an infinite while loop, listen to user input commands. check that the command correspond with the login status.
          * For example, sending a message requires the user to be logged in, while creating a new account requires the user to
          * be logged out. For commands that require logged in privileges, append the current cookie to the end of the message
@@ -212,7 +248,8 @@ public class ChatClient {
         }
         
 
-        /** Add header information, such as version number and length of message and 
+        /**
+         * Add header information, such as version number and length of message and 
          * send it to the server
          * @param message message to be sent over to the server
          */
@@ -222,7 +259,8 @@ public class ChatClient {
     }
     
 
-    /** main function to start a chat client. 
+    /**
+     * Main function to start a chat client. 
      * Create a new ChatClient instance, and connect to the server.
      * @throws Exception throws the exception from connectToServer
      */

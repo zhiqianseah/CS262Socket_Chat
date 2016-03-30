@@ -15,56 +15,108 @@ import java.util.Scanner;
  * Server side of the Socket Chat Application. Initialized by a command-line input of the port number
  * to listen to. The main thread will then listen to connections from chat clients. For each client
  * connection, the server will spawn a new thread of class 'chat' that will read the client inputs and respond accordingly.
- *
  */
 public class ChatServer {
 
-	/**Hash table to store user accounts. Used for login verification
+	/**
+	 * Hash table to store user accounts. Used for login verification
 	 * Key = username. Value = password
 	 */
 	private static HashMap<String, String> accounts; 
 	
-	/**Hash table to store client sockets. Used to send messages back to the client
+	/**
+	 * Hash table to store client sockets. Used to send messages back to the client
 	 * Key = username. Value = socket
 	 */
 	private static HashMap<String, PrintWriter> acc_sockets;  //username and sockets
 	
 
-	/**Hash table to store users in chat groups. 
-	 *	Key = group name. Value = list of users in the group
+	/**
+	 * Hash table to store users in chat groups. 
+	 * Key = group name. Value = list of users in the group
 	 */
 	private static HashMap<String, List<String>> groups;
 	
 
-	/**Hash table to store messages received when a user is offline
-	 *	key = username. Value = list of messages received when offline
+	/**
+	 * Hash table to store messages received when a user is offline
+	 * Key = username. Value = list of messages received when offline
 	 */
 	private static HashMap<String, List<String>> undeliveredMessages;
 	
 
-	/**Hash table to store the current status of the account. 
-	 *	key = username. Value = one of [OFFLINE, ONLINE]
+	/**
+	 * Hash table to store the current status of the account. 
+	 * Key = username. Value = one of [OFFLINE, ONLINE]
 	 */
 	private static HashMap<String, String> accountStatus;
 
 	
     //List of accepted opcodes	
+	/**
+	 * Command to create an account for the chat room
+	 * using a user name and password as arguments.
+	 */
 	private static final String CREATE = ":create"; 
+	/**
+	 * Command that lists all the accounts in the chat room
+	 * or a subset of the accounts, by text wildcard
+	 */
 	private static final String LISTACCOUNT = ":listaccount";
+	/**
+	 * Command that allows a user to login to the chat room
+	 * using a user name and password as arguments.
+	 */
 	private static final String LOGIN = ":login";
+	/**
+	 * Command that lists all the groups in the chat room
+	 * or a subset of the groups, by text wildcard
+	 */
 	private static final String LISTGROUP = ":listgroup";
+	/**
+	 * Command that sends a single message to an account.
+	 * If the recipient is logged in, deliver immediately; 
+	 * otherwise queue the message and deliver on demand
+	 */
 	private static final String TOACCOUNT = ":send";
+	/**
+	 * Command that sends a single message to all members of the group.
+	 * If the recipient is logged in, deliver immediately; 
+	 * otherwise queue the message and deliver on demand
+	 */
 	private static final String TOGROUP = ":togroup";
+	/**
+	 * Command that creates a group
+	 */
 	private static final String GROUP = ":group";
+	/**
+	 * Command to log out from the chat room
+	 */
 	private static final String SIGNOUT = ":signout";
+	/**
+	 * Command to delete an account
+	 */
 	private static final String DELETE = ":delete"; 
+	/**
+	 * Command to show all chat room commands.
+	 */
 	private static final String HELP = ":help"; 	   
-	
-	private static final String ONLINE = "ONLINE"; 	   
+	/**
+	 * String constant for a user's online status
+	 */
+	private static final String ONLINE = "ONLINE";
+	/**
+	 * String constant for a user's offline status
+	 */
 	private static final String OFFLINE = "OFFLINE"; 	 	
-	
+	/**
+	 * String constant for the current application version
+	 */
     private static final String APPVERSION = "ChatApp_v0.1";
-
+    
+    /**
+     * Main function to start a chat server.
+     */
     public static void main(String[] args) throws Exception {
     	
         accounts = new HashMap<String, String>();
@@ -107,7 +159,8 @@ public class ChatServer {
         private Socket socket;
         private int clientNumber;
 
-        /** Initialization of a new chat thread. Store the socket and client number internally, and log
+        /** 
+         * Initialization of a new chat thread. Store the socket and client number internally, and log
          * the initialization.
          * @param socket Socket that the client is connecting from.
          * @param clientNumber An assigned client number to differentiate clients easily for logging/debugging purposes
@@ -120,13 +173,13 @@ public class ChatServer {
 
 
 
-        /** Run the chat thread. The chat thread will first store the server's input stream and client's output stream
+        /** 
+         * Run the chat thread. The chat thread will first store the server's input stream and client's output stream
          * to be used for server-client communication. It then sends a welcome message to the client to notify that
          * the connection is successful, and to prompt the user for chat commands.
          * The thread then goes into an infinite while loop to read inputs from the client, process it accordingly by calling
          * parseMessage. When the connection is broken, such as by the client closing the chat app or a network disruption,
-         *  an exception is thrown and the thread is ended.
-         * 
+         * an exception is thrown and the thread is ended.
          */
         public void run() {
             try {
@@ -168,7 +221,8 @@ public class ChatServer {
         }
 
         //Parse the input string from the user to decide on the next course of action
-        /** Process a command sent by the client.
+        /** 
+         * Process a command sent by the client.
          * The input message is first checked for valid headers, and split via whitespaces into a message array. 
          * The main content of the message is then processed based on the op_code of the main message. The opcode is always 
          * in the first element of the message array.
@@ -363,7 +417,8 @@ public class ChatServer {
         }
         
         
-        /** Check if the headers of the client side message is valid. There are 2 levels of checks. 
+        /** 
+         * Check if the headers of the client side message is valid. There are 2 levels of checks. 
          * First, the chat app version number has to be correct. 
          * Secondly, the message length has to be correct.
          * @param msg client-side message that will be checked.
@@ -398,7 +453,8 @@ public class ChatServer {
  
         //Add header information, such as version number and length of message
         //Send message to server
-        /**Pad the message with a header that does not modify the cookies and send it over the network.
+        /**
+         * Pad the message with a header that does not modify the cookies and send it over the network.
          * The header contains the app version number, an opcode that says that this server reply does not
          * modify the cookie, 
          * and the length of the message (to be used as a checker on the client side).
@@ -412,7 +468,8 @@ public class ChatServer {
         }
  
 
-        /**Pad the message with a header to set cookies and send it over the network.
+        /**
+         * Pad the message with a header to set cookies and send it over the network.
          * The header contains the app version number, an opcode to set the cookie followed by the cookie, 
          * and the length of the message (to be used as a checker on the client side).
          * This function is used when the client signs in to the chat application, either via
@@ -428,7 +485,8 @@ public class ChatServer {
         }  
      
 
-        /**Pad the message with a header to clear cookies and send it over the network.
+        /**
+         * Pad the message with a header to clear cookies and send it over the network.
          * The header contains the app version number, an opcode to clear the cookie on the client side, 
          * and the length of the message (to be used as a checker on the client side).
          * This function is only used when the client chooses to exit the chat application, either via
@@ -442,10 +500,11 @@ public class ChatServer {
         }     
         
 
-        /** Create an account with (username, password)
-         *  Check if the username has been taken. If it has not been taken, add the (username, password) 
-         *  into the accounts table, and set the user as "ONLINE". This is because the chat server will automatically
-         *  log the client in after he creates an account.  
+        /** 
+         * Create an account with (username, password)
+         * Check if the username has been taken. If it has not been taken, add the (username, password) 
+         * into the accounts table, and set the user as "ONLINE". This is because the chat server will automatically
+         * log the client in after he creates an account.  
          * @param name Username to be created
          * @param password password associated to the username.
          * @return false if the account name has already name. True otherwise
@@ -463,7 +522,8 @@ public class ChatServer {
         	return success;
         }
         
-        /** Send a message to another user (receiver). A few levels of checks has to be done.
+        /**
+         * Send a message to another user (receiver). A few levels of checks has to be done.
          * Firstly, check if the receiver is a valid user by if the username exist in the accounts table.
          * Secondly, check if the receiver is online. If the user is online, the chat server can send the 
          * message to the receiver directly. If the receiver is offline, save the message in the 
@@ -516,9 +576,10 @@ public class ChatServer {
         }
         
 
-        /** Check if the login credentials are valid. This is a 2-level check.
-         *  Firstly, the username has to exist in the accounts.
-         *  Secondly, the password given has to match the password in the accounts.
+        /** 
+         * Check if the login credentials are valid. This is a 2-level check.
+         * Firstly, the username has to exist in the accounts.
+         * Secondly, the password given has to match the password in the accounts.
          * @param name username received by chat server
          * @param password password associated with the username
          * @return true if the username and password is correct, false otherwise
@@ -543,7 +604,8 @@ public class ChatServer {
         	
         }        
         
-        /** Called when a message with opcode SIGNOUT is received by the chat server. 
+        /**
+         * Called when a message with opcode SIGNOUT is received by the chat server. 
          * Sign the user out of the system by setting accountstatus to offline.
          * @param name username that will be signed out of the chat application.
          */
@@ -556,7 +618,8 @@ public class ChatServer {
             
 
 
-        /** output the logging to screen
+        /**
+         * Output the logging to screen
          * @param message Log message that will be displayed on screen
          */
         private void log(String message) {
